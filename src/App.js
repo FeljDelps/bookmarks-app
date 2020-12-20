@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Route } from 'react-router-dom';
 import AddBookmark from './AddBookmark/AddBookmark';
 import BookmarkList from './BookmarkList/BookmarkList';
 import Nav from './Nav/Nav';
@@ -31,20 +32,22 @@ const bookmarks = [
 
 class App extends Component {
   state = {
-    page: 'list',
+    //page: 'list', (removing all references to page in state)
     bookmarks,
     error: null,
   };
 
+  /* removing all page references to page in state
   changePage = (page) => {
     this.setState({ page })
   }
+  */
 
   setBookmarks = bookmarks => {
     this.setState({
       bookmarks,
       error: null,
-      page: 'list',
+      //page: 'list',
     })
   }
 
@@ -73,23 +76,59 @@ class App extends Component {
   }
 
   render() {
-    const { page, bookmarks } = this.state
+    //const { page, bookmarks } = this.state -removing all references to page in state
+    
+    //replace with new const just for bookmarks
+    const { bookmarks } = this.state
+    
     return (
       <main className='App'>
         <h1>Bookmarks!</h1>
-        <Nav clickPage={this.changePage} />
+        { /* <Nav clickPage={this.changePage} /> -removing all references to page in state*/ }
+        
+        { /*replace with new Nav component w no props */}
+        <Nav />
+
         <div className='content' aria-live='polite'>
-          {page === 'add' && (
+          
+          { /* -removing all references to page in state
+            page === 'add' && (
             <AddBookmark
               onAddBookmark={this.addBookmark}
               onClickCancel={() => this.changePage('list')}
             />
-          )}
-          {page === 'list' && (
+          ) */}
+
+          {/*Replace with a Route component.  Notice the render prop added in.  It takes a function. 
+          We use this because we need to control some props that get added to the Addbookmark component
+          We give the render prop a parameter called "Route-props" to destruct the history*/}
+          <Route
+            path='/add-bookmark'
+            render={({ history }) => {
+              console.log(history)
+              return <AddBookmark
+                onAddBookmark={this.addBookmark}
+                onClickCancel={() => {history.push('/')}}
+                />
+            }}
+              />
+          
+          { /* -removing all references to page in state
+            page === 'list' && (
             <BookmarkList
               bookmarks={bookmarks}
             />
-          )}
+          ) */}
+
+          {/*Replace with Route component.  Notice render prop added in. It takes a function.
+          We use this because we need to control some props that get added to the BookmarkList component */}
+          <Route
+            exact path='/'
+            render={() => 
+              <BookmarkList
+                bookmarks={bookmarks} 
+              />} 
+          />
         </div>
       </main>
     );
